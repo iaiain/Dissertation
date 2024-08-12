@@ -488,61 +488,40 @@ modOutputs(m3)
 m4 <- glmer(Malaria ~ Age + Sex + Earth.floor + (1 | HID/PID), 
             family = binomial(link="logit"), data = Walukuba,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m4)                                   # Age and earth floors are significant, sex is not
-fixef(m4) %>% exp() %>% round(.,digits = 3)   # Age OR: 0.981   Earth OR: 1.684
-r2(m4)                                        # Conditional R2: 0.260, Marginal R2: 0.035
-calcVPCs(m4)                                  # 0.766 0.070 0.164
+modOutputs(m4)
 
 # including all household variables
 m6 <- glmer(Malaria ~ Age + Sex + Type + Earth.floor + Wealth + Meals.per.day + (1 | HID/PID), 
             family = binomial(link="logit"), data = Walukuba,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m6)                                   # Age and earth are significant, all others are not
-fixef(m6) %>% exp() %>% round(.,digits = 3)   # Age OR: 0.981   Earth OR: 1.901
-r2(m6)                                        # Conditional R2: 0.263, Marginal R2: 0.047
-calcVPCs(m6)                                  # 0.773 0.068 0.159
+modOutputs(m6)
 
 # leaving in Type, trying some random effects
 m7 <- glmer(Malaria ~ Age + Sex + Type + (Type | HID/PID), 
             family = binomial(link="logit"), data = Walukuba,
             glmerControl(optimizer = "bobyqa")) # failed to converge: degenerate  Hessian with 1 negative eigenvalues
-modOutputs(m7)                                   # Model is nearly unidentifiable: large eigenvalue ratio
-fixef(m7) %>% exp() %>% round(.,digits = 3)   # -
-r2(m7)                                        # Conditional R2: 0.260, Marginal R2: 0.022
-calcVPCs(m7)                                  # 0.776 0.107 0.117
+modOutputs(m7)
 
 # leaving in Type, trying some random effects
 m8 <- glmer(Malaria ~ Age + Sex + Type + (Age | HID/PID), 
             family = binomial(link="logit"), data = Walukuba,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m8)                                   # Age is significant
-fixef(m8) %>% exp() %>% round(.,digits = 3)   # Age OR: 0.979
-r2(m8)                                        # Conditional R2: NA, Marginal R2: NA
-calcVPCs(m8)                                  # 0.734 0.038 0.228
+modOutputs(m8)
 
 m9 <- glmer(Malaria ~ Age + Sex + Type + (Earth.floor | HID/PID), 
             family = binomial(link="logit"), data = Walukuba,
             glmerControl(optimizer = "bobyqa")) # large eigenvalue ratio
-modOutputs(m9)                                   # Age is significant
-fixef(m9) %>% exp() %>% round(.,digits = 3)   # Age OR: 0.980
-r2(m9)                                        # Conditional R2: 0.276, Marginal R2: 0.025
-calcVPCs(m9)                                  # 0.741 0.045 0.214
+modOutputs(m9)
 
 m10 <- glmer(Malaria ~ Age + Sex + Type + Type:Age + (1 | HID/PID), 
             family = binomial(link="logit"), data = Walukuba,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m10)                                   # Age is significant
-fixef(m10) %>% exp() %>% round(.,digits = 3)   # Age OR: 0.979
-r2(m10)                                        # Conditional R2: 0.256, Marginal R2: 0.023
-calcVPCs(m10)                                  # 0.761 0.070 0.169
+modOutputs(m10)
 
 m11 <- glmer(Malaria ~ Age + Sex + Type + Type:Wealth + (1 | HID/PID), 
              family = binomial(link="logit"), data = Walukuba,
              glmerControl(optimizer = "bobyqa"))
-modOutputs(m11)                                   # Age is significant
-fixef(m11) %>% exp() %>% round(.,digits = 3)   # Age OR: 0.980
-r2(m11)                                        # Conditional R2: 0.261, Marginal R2: 0.036
-calcVPCs(m11)                                  # 0.766 0.069 0.165
+modOutputs(m11)
 
 # HOUSEHOLD MODELS (Nagongera)    ----
 Nagongera <- master %>% filter(Subcounty == "Nagongera")
@@ -551,77 +530,60 @@ Nagongera <- master %>% filter(Subcounty == "Nagongera")
 m5 <- glmer(Malaria ~ Age + Sex + Type + (1 | HID/PID), 
                family = binomial(link="logit"), data = Nagongera,
                glmerControl(optimizer = "bobyqa"))
-modOutputs(m5)                                   # age significant, type not significant
-r2(m5)                                        # Conditional R2: 0.369, Marginal R2: 0.284
-calcVPCs(m5)                                  # 0.880 0.098 0.022
+modOutputs(m5)
 
 # null model
-m0 <- glmer(Malaria ~ 1 + (1 | HID/PID), family = binomial(link="logit"), data = Nagongera)
-modOutputs(m0)                                   # Singularity... uh oh
-fixef(m0) %>% exp() %>% round(.,digits = 3)   # Age OR: 0.980
-confint(m0,method="Wald") %>% exp() %>% round(.,digits = 3)
-r2(m0)                                        # Conditional R2: NA
-calcVPCs(m0)                                  # 0.798 0.202 0.000
+m0 <- glmer(Malaria ~ 1 + (1 | HID/PID), 
+            family = binomial(link="logit"), data = Nagongera)
+modOutputs(m0)
 
 # baseline model
-m1 <- glmer(Malaria ~ Age + Sex + (1 | HID/PID), family = binomial(link="logit"), data = Nagongera,
+m1 <- glmer(Malaria ~ Age + Sex + (1 | HID/PID), 
+            family = binomial(link="logit"), data = Nagongera,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m1)                                   # age significant
-r2(m1)                                        # Conditional R2: 0.369, Marginal R2: 0.284
-calcVPCs(m1)                                  # 0.881 0.097 0.022
+modOutputs(m1)
 
 # adding wealth
-m2 <- glmer(Malaria ~ Age + Sex + Wealth + (1 | HID/PID), family = binomial(link="logit"), data = Nagongera,
+m2 <- glmer(Malaria ~ Age + Sex + Wealth + (1 | HID/PID), 
+            family = binomial(link="logit"), data = Nagongera,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m2)                                   # age significant
-r2(m2)                                        # Conditional R2: 0.370, Marginal R2: 0.286
-calcVPCs(m2)                                  # 0.882 0.098 0.020
+modOutputs(m2)
 
 # adding meals
-m3 <- glmer(Malaria ~ Age + Sex + Meals.per.day + (1 | HID/PID), family = binomial(link="logit"), data = Nagongera,
+m3 <- glmer(Malaria ~ Age + Sex + Meals.per.day + (1 | HID/PID), 
+            family = binomial(link="logit"), data = Nagongera,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m3)                                   # age significant
-r2(m3)                                        # Conditional R2: 0.370, Marginal R2: 0.284
-calcVPCs(m3)                                  # 0.880 0.098 0.022
+modOutputs(m3)
 
 # adding earth
-m4 <- glmer(Malaria ~ Age + Sex + Earth.floor + (1 | HID/PID), family = binomial(link="logit"), data = Nagongera,
+m4 <- glmer(Malaria ~ Age + Sex + Earth.floor + (1 | HID/PID), 
+            family = binomial(link="logit"), data = Nagongera,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m4)                                   # age significant
-r2(m4)                                        # Conditional R2: 0.369, Marginal R2: 0.284
-calcVPCs(m4)                                  # 0.881 0.097 0.022
+modOutputs(m4)
 
 # all household variables 
-m6 <- glmer(Malaria ~ Age + Sex + Type + Wealth + Earth.floor + Meals.per.day + (1 | HID/PID), family = binomial(link="logit"), data = Nagongera,
+m6 <- glmer(Malaria ~ Age + Sex + Type + Wealth + Earth.floor + Meals.per.day + (1 | HID/PID), 
+            family = binomial(link="logit"), data = Nagongera,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m6)                                   # age significant,
-r2(m6)                                        # Conditional R2: 0.371, Marginal R2: 0.286
-calcVPCs(m6)                                  # 0.884 0.089 0.027
+modOutputs(m6)
 
 # random slope - type
-m7 <- glmer(Malaria ~ Age + Sex + Type + (Type | HID/PID), family = binomial(link="logit"), data = Nagongera,
+m7 <- glmer(Malaria ~ Age + Sex + Type + (Type | HID/PID), 
+            family = binomial(link="logit"), data = Nagongera,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m7)                                   # age significant, singular fit (no variance in slopes wrt age, but singularity coming from HID level i believe)
-r2(m7)                                        # Conditional R2: NA, Marginal R2: 0.654 woah
-calcVPCs(m7)                                  # 0.646 0.343 0.011
+modOutputs(m7)
 
 # random slope - age at PID level only
-m8 <- glmer(Malaria ~ Age + Sex + Type + (Age | HID/PID), family = binomial(link="logit"), data = Nagongera,
+m8 <- glmer(Malaria ~ Age + Sex + Type + (Age | HID/PID), 
+            family = binomial(link="logit"), data = Nagongera,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m8)                                   # age significant, type not significant
-r2(m8)                                        # Conditional R2: 0.792, Marginal R2: 0.391
-calcVPCs(m8)                                  # 0.645 0.341 0.014 WOAH
+modOutputs(m8)
 
 # interaction between age:Type? 
-m9 <- glmer(Malaria ~ Age + Sex + Type + Age:Type + (1 | HID/PID), family = binomial(link="logit"), data = Nagongera,
+m9 <- glmer(Malaria ~ Age + Sex + Type + Age:Type + (1 | HID/PID), 
+            family = binomial(link="logit"), data = Nagongera,
             glmerControl(optimizer = "bobyqa"))
-modOutputs(m9)                                   # age significant, age:type is significant as well
-r2(m9)                                        # Conditional R2: 0.372, Marginal R2: 0.287
-calcVPCs(m9)                                  # 0.881 0.097 0.022
-
-fixef(m) %>% exp() %>% round(.,digits = 3)
-confint(m,method="Wald") %>% exp() %>% round(.,digits = 3)
-
+modOutputs(m9)
 
 # PLOTTING RESIDUALS              ----
 # I will do this once for each subcounty using the main m5 model
